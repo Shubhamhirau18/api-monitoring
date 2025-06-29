@@ -179,7 +179,7 @@ open http://localhost:8080
 # or
 curl http://localhost:8080
 
-# Grafana (login: admin/admin123)
+# Grafana (login: admin/admin)
 open http://localhost:3000
 
 # Prometheus

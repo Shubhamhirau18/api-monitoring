@@ -285,7 +285,7 @@ display_access_info() {
     echo "📊 Access your services directly (no port-forwarding needed):"
     echo "  • Monitoring Dashboard: http://localhost:8080"
     echo "  • Prometheus:           http://localhost:9090"
-    echo "  • Grafana:              http://localhost:3000 (admin/admin123)"
+    echo "  • Grafana:              http://localhost:3000 (admin/admin)"
     echo "  • MailHog:              http://localhost:8025"
     echo
     echo "🔧 How it works:"

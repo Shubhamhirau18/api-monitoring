@@ -42,7 +42,7 @@ Once deployed, you can access:
 
 - **Monitoring Dashboard**: http://localhost:8080
 - **Prometheus**: http://localhost:9090
-- **Grafana**: http://localhost:3000 (admin/admin123)
+- **Grafana**: http://localhost:3000 (admin/admin)
 - **MailHog**: http://localhost:8025
 
 ## 📁 Manifest Files
@@ -217,7 +217,7 @@ Edit `configmaps.yaml` (prometheus.yml section) to modify:
 - External labels
 
 ### Grafana Configuration
-- Default credentials: admin/admin123
+- Default credentials: admin/admin
 - Dashboards are auto-provisioned
 - Datasources are auto-configured
 

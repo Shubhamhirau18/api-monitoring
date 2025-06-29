@@ -738,7 +738,7 @@ When using `docker compose up -d`, the following services are available:
 ### **Access Points**
 - **🖥️ Monitoring Dashboard**: http://localhost:8080 (Main application)
 - **📈 Prometheus Metrics**: http://localhost:9090 (Time-series database and metrics collection)
-- **📊 Grafana Dashboards**: http://localhost:3000 (Visualization - admin/admin123)
+- **📊 Grafana Dashboards**: http://localhost:3000 (Visualization - admin/admin)
 - **📧 MailHog Web UI**: http://localhost:8025 (Email testing web interface)
 - **📬 MailHog SMTP**: localhost:1025 (SMTP server for email alerts)
 - **🔍 Monitoring Metrics**: http://localhost:8080/metrics (Prometheus metrics endpoint)
