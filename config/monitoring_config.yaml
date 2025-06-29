@@ -1,0 +1,150 @@
+monitoring:
+  interval_seconds: 30
+  timeout_seconds: 10
+  max_workers: 5
+  verify_ssl: false
+  # Outage detection configuration
+  outage_detection:
+    consecutive_failures_threshold: 3 # Number of consecutive failures to trigger outage
+    degraded_threshold: 2 # Number of consecutive failures to mark as degraded
+    recovery_success_threshold: 2 # Number of consecutive successes to mark as recovered
+    failure_window_minutes: 10 # Time window to track failures
+    critical_outage_duration_minutes: 5 # Duration after which outage becomes critical
+    timeout_as_failure: true # Treat timeouts as failures
+    http_5xx_as_failure: true # Treat 5xx status codes as failures
+    http_4xx_as_failure: false # Treat 4xx status codes as failures (usually client errors) # due to httpbin.org is having issue with some cacert issue
+
+endpoints:
+  - name: "httpbin_get"
+    url: "https://httpbin.org/get"
+    method: "GET"
+    expected_status: 200
+    sla:
+      availability_percentage: 99.9
+      max_response_time_ms: 3500
+    slo:
+      max_avg_response_time_ms: 2000
+      max_error_rate_percentage: 1.0
+    validation:
+      content_checks:
+        - type: "json_key_exists"
+          key: "url"
+        - type: "json_key_value"
+          key: "url"
+          expected: "https://httpbin.org/get"
+
+  - name: "httpbin_post"
+    url: "https://httpbin.org/post"
+    method: "POST"
+    expected_status: 200
+    headers:
+      Content-Type: "application/json"
+    body:
+      test: "data"
+      timestamp: "{{timestamp}}"
+    sla:
+      availability_percentage: 99.5
+      max_response_time_ms: 4000
+    slo:
+      max_avg_response_time_ms: 2500
+      max_error_rate_percentage: 2.0
+    validation:
+      content_checks:
+        - type: "json_key_exists"
+          key: "json"
+
+  - name: "httpbin_delay"
+    url: "https://httpbin.org/delay/2"
+    method: "GET"
+    expected_status: 200
+    sla:
+      availability_percentage: 95.0
+      max_response_time_ms: 5000
+    slo:
+      max_avg_response_time_ms: 1500 # This will trigger alerts (delay/2 takes ~2000ms)
+      max_error_rate_percentage: 5.0
+
+  - name: "httpbin_status_500"
+    url: "https://httpbin.org/status/500"
+    method: "GET"
+    expected_status: 500
+    sla:
+      availability_percentage: 0.0 # Expect this to fail for testing
+      max_response_time_ms: 3000
+    slo:
+      max_avg_response_time_ms: 2000
+      max_error_rate_percentage: 100.0
+
+  # Guaranteed to fail endpoint for demo purposes
+  - name: "demo_alert_trigger"
+    url: "https://httpbin.org/delay/5"
+    method: "GET"
+    expected_status: 200
+    sla:
+      availability_percentage: 99.9
+      max_response_time_ms: 2000 # Will always fail (5s delay vs 2s max)
+    slo:
+      max_avg_response_time_ms: 1000 # Will trigger SLO violation
+      max_error_rate_percentage: 1.0
+
+  # ====================================================================
+  # ADD YOUR OWN ENDPOINTS HERE - Example of a real production endpoint
+  # ====================================================================
+
+  - name: "google_health"
+    url: "https://www.google.com" # Replace with your API
+    method: "GET"
+    expected_status: 200
+    timeout_seconds: 5
+    # headers:
+    #   Authorization: "Bearer your-api-token" # If needed
+    sla:
+      availability_percentage: 99.9 # High availability requirement
+      max_response_time_ms: 2000 # 2 second max response time
+    slo:
+      max_avg_response_time_ms: 1000 # 1 second average response time
+      max_error_rate_percentage: 0.5 # 0.5% error rate
+    # validation:
+    #   content_checks:
+    #     - type: "json_key_exists"
+    #       key: "status"
+    #     - type: "json_key_value"
+    #       key: "status"
+    #       expected: "ok"
+
+data_storage:
+  type: "prometheus" # Options: prometheus, file
+  prometheus:
+    expose_port: 8080
+    metrics_path: "/metrics"
+    job_name: "api_monitoring"
+  file:
+    path: "./data/metrics.json"
+
+alerting:
+  enabled: true
+  max_repeats: 0 # 0 = unlimited repeats, >0 = max number of repeats
+  repeat_interval_minutes: 1 # Repeat active alerts every 15 minutes
+  auto_resolve_after_hours: 24 # Auto-resolve alerts after 24 hours
+  channels:
+    - type: "console"
+      enabled: true
+    - type: "email"
+      enabled: true
+      smtp_server: "mailhog" # Docker service name
+      smtp_port: 1025
+      username: "" # MailHog doesn't require authentication
+      password: "" # MailHog doesn't require authentication
+      from_address: "oncall@mailhog.local"
+      to_addresses: ["admin@mailhog.local", "devops@mailhog.local"]
+      use_tls: false # MailHog doesn't use TLS
+      timezone: "Asia/Kolkata"
+
+reporting:
+  dashboard_port: 8080
+  metrics_retention_days: 30
+  report_intervals:
+    - "1h"
+    - "24h"
+    - "7d"
+    - "30d"

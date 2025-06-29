@@ -1,0 +1,196 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: monitoring-app-network-policy
+  namespace: monitoring-system
+  labels:
+    app.kubernetes.io/name: monitoring-app
+    app.kubernetes.io/part-of: brightedge-monitoring
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: monitoring-app
+      app.kubernetes.io/component: application
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+        - podSelector: {} # Allow from same namespace
+      ports:
+        - protocol: TCP
+          port: 8080
+    - from: [] # Allow external traffic for NodePort access
+      ports:
+        - protocol: TCP
+          port: 8080
+  egress:
+    - to: [] # Allow all outbound (for API monitoring)
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 1025 # MailHog SMTP
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: mailhog
+      ports:
+        - protocol: TCP
+          port: 1025
+    - to: [] # DNS
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prometheus-network-policy
+  namespace: monitoring-system
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: brightedge-monitoring
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+      app.kubernetes.io/component: metrics
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: grafana
+        - podSelector: {} # Allow from same namespace
+      ports:
+        - protocol: TCP
+          port: 9090
+    - from: [] # Allow external traffic for NodePort access
+      ports:
+        - protocol: TCP
+          port: 9090
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: monitoring-app
+      ports:
+        - protocol: TCP
+          port: 8080
+    - to: [] # Kubernetes API
+      ports:
+        - protocol: TCP
+          port: 443
+    - to: [] # DNS
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-network-policy
+  namespace: monitoring-system
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: brightedge-monitoring
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/component: visualization
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring-system
+        - podSelector: {} # Allow from same namespace
+      ports:
+        - protocol: TCP
+          port: 3000
+    - from: [] # Allow external traffic for NodePort access
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 9090
+    - to: [] # DNS
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mailhog-network-policy
+  namespace: monitoring-system
+  labels:
+    app.kubernetes.io/name: mailhog
+    app.kubernetes.io/part-of: brightedge-monitoring
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: mailhog
+      app.kubernetes.io/component: email
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring-system
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: monitoring-app
+        - podSelector: {} # Allow from same namespace
+      ports:
+        - protocol: TCP
+          port: 1025
+        - protocol: TCP
+          port: 8025
+    - from: [] # Allow external traffic for NodePort access
+      ports:
+        - protocol: TCP
+          port: 8025
+  egress:
+    - to: [] # DNS
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+ 

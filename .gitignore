@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test and coverage reports
+.coverage
+.tox/
+.nox/
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode settings
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Local SQLite database files
+*.sqlite3
+*.db
+
+# Node modules (if using JS/TS)
+node_modules/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Temporary files
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Ignore secrets
+secrets.json
