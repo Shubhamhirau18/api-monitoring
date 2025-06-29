@@ -2,6 +2,8 @@
 
 A comprehensive API monitoring solution with SLA/SLO tracking, alerting, and visualization capabilities. This system monitors HTTP endpoints, tracks performance metrics, detects violations, and provides real-time alerts and dashboards.
 
+**[📺 Demo Alert Video](https://drive.google.com/file/d/1TfJnD7lG4cWWxbwe7-V8WA-Dfbg-TlV3/view?usp=sharing)**
+
 ## 🚀 Features
 
 ### Core Monitoring
@@ -61,8 +63,8 @@ Choose your preferred deployment method based on your needs:
 
 ```bash
 # Quick start
-git clone <repository-url>
-cd api_monitoring
+git clone https://github.com/Shubhamhirau18/api-monitoring.git
+cd api-monitoring
 docker compose up -d
 
 # Access services
@@ -82,8 +84,8 @@ brew install kind kubectl  # macOS
 # or follow guide for Linux/Windows
 
 # One-command deployment
-git clone <repository-url>
-cd api_monitoring
+git clone https://github.com/Shubhamhirau18/api-monitoring.git
+cd api-monitoring
 ./k8s/deploy.sh
 
 # Access services (no port-forward needed!)
@@ -870,18 +872,6 @@ The configuration includes test endpoints:
 - `httpbin.org/post` - POST test with body
 - `httpbin.org/delay/2` - Delayed response test
 - `httpbin.org/status/500` - Error response test
-
-### Outage Detection Demo
-
-```bash
-# Interactive outage detection demo
-python3 demo_outage_detection.py
-
-# Show outage detection configuration options
-python3 demo_outage_detection.py --config
-```
-
-## 📊 Sample Video
 
 To demonstrate the alert functionality:
 
